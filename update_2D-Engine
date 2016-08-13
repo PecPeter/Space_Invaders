@@ -1,0 +1,10 @@
+#/bin/bash
+
+echo "Deleting old files..."
+rm -r ./include/2D-Engine/* ./lib/lib2D-Engine*
+
+echo "Copying new files..."
+cp -r ~/Programming/2D-Engine/include/* ./include
+cp -r ~/Programming/2D-Engine/lib/* ./lib
+
+echo "Finished updating files"

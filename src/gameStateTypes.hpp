@@ -1,0 +1,12 @@
+#ifndef GAMESTATETYPES_HPP
+#define GAMESTATETYPES_HPP
+
+enum eStateAction
+{
+	NONE,
+	REMOVE_STATE,
+	MENU_STATE,
+	MAIN_STATE
+};
+
+#endif
