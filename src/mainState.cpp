@@ -62,6 +62,24 @@ cMainState::cMainState (void): cGameState(eStateAction::NONE,
 	shield2_ = world_->createEntity(3,posShield2,shieldNodes);
 	shield3_ = world_->createEntity(4,posShield3,shieldNodes);
 	shield4_ = world_->createEntity(5,posShield4,shieldNodes);
+
+	// Create the bullets
+	cCollAabb bulletShape(1.0,1.0);
+
+	cPosComp bulletPos(0.0,0.0,0);
+
+	cCollComp bulletCollComp(bulletShape);
+	
+	cEntityNode bulletNode(0,bulletPos,bulletCollComp);
+
+	for (int i = 0; i < 12; ++i)
+	{
+		bulletArray_[i] = world_->createEntity(6+i,bulletPos,bulletNode,
+				eEntityType::DYNAMIC);
+		bulletArray_[i]->setNodeActivity(0,false);
+	}
+	playerBulletVel_ = 10;
+	alienBulletVel_ = 5;
 }
 
 cMainState::~cMainState (void)
@@ -87,6 +105,7 @@ void cMainState::handleState (SDL_Event& event)
 
 int cMainState::updateState (double tickRate, void** interStateInfo)
 {
+	// Move the player ship, shoot or quit
 	if (kbActions_.size() > 0) {
 		for (auto& kbCommand : kbActions_) {
 			switch (kbCommand) {
@@ -97,6 +116,8 @@ int cMainState::updateState (double tickRate, void** interStateInfo)
 					ship_->translate(1,0);
 					break;
 				case eKbAction::SHOOT:
+					bulletArray_[0]->setNodeActivity(0,true);
+					bulletArray_[0]->setPos(ship_->getPos());
 					break;
 				case eKbAction::QUIT:
 					return eStateAction::REMOVE_STATE;
@@ -106,6 +127,24 @@ int cMainState::updateState (double tickRate, void** interStateInfo)
 			}
 		}
 	}
+
+	// Move the aliens
+	
+	// Shoot alien bullets
+	
+	// Move the bullets
+	if (bulletArray_[0]->getActivity() == true)
+	{
+		bulletArray_[0]->translate(0,-playerBulletVel_);
+	}
+	for (int i = 1; i < 12; ++i)
+	{
+		if (bulletArray_[i]->getActivity() == true)
+		{
+			bulletArray_[i]->translate(0,alienBulletVel_);
+		}
+	}
+
 	std::forward_list<cCollPair> collPairList = world_->checkColls();
 	while (collPairList.empty() == false)
 	{

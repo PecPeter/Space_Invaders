@@ -44,6 +44,12 @@ class cMainState : public cGameState
 			   * shield2_,
 			   * shield3_,
 			   * shield4_;
+
+		// Entitiy vector for the bullets (player and aliens can only shoot once)
+		// First bullet in the array is for the player shot
+		cEntity* bulletArray_[12];
+		double playerBulletVel_,
+			   alienBulletVel_;
 };
 
 #endif
