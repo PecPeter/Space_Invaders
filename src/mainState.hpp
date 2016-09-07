@@ -11,6 +11,8 @@
 #include "2D-Engine/entity/entity.hpp"
 #include "2D-Engine/entity/entityNode.hpp"
 
+#include "entityMasks.hpp"
+#include "usrPtrObjects.hpp"
 #include "gameStateTypes.hpp"
 #include "collHandler.hpp"
 
@@ -44,6 +46,11 @@ class cMainState : public cGameState
 			   * shield2_,
 			   * shield3_,
 			   * shield4_;
+
+		sShieldHealth shield1Hp_,
+					  shield2Hp_,
+					  shield3Hp_,
+					  shield4Hp_;
 
 		// Entitiy vector for the bullets (player and aliens can only shoot once)
 		// First bullet in the array is for the player shot
