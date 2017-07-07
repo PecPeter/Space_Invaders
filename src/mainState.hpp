@@ -1,15 +1,19 @@
 #ifndef MAINSTATE_HPP
 #define MAINSTATE_HPP
 
+#include <ctime>
 #include <iostream>
+#include <cmath>
 #include <vector>
 
+#include "2D-Engine/engineMetrics.hpp"
 #include "2D-Engine/gameState.hpp"
 #include "2D-Engine/collision/collDebugDrawer.hpp"
 #include "2D-Engine/controllers/cntrlKb.hpp"
 #include "2D-Engine/collision/collWorld.hpp"
 #include "2D-Engine/entity/entity.hpp"
 #include "2D-Engine/entity/entityNode.hpp"
+#include "mathLib/mtrand.hpp"
 
 #include "entityMasks.hpp"
 #include "usrPtrObjects.hpp"
@@ -21,6 +25,7 @@ enum class eKbAction
 	M_LEFT,
 	M_RIGHT,
 	SHOOT,
+	TOGGLE_DEBUG,
 	QUIT
 };
 
@@ -47,6 +52,11 @@ class cMainState : public cGameState
 			   * shield3_,
 			   * shield4_;
 
+		cEntity* leftSensor_,
+			   * rightSensor_,
+			   * groundSensor_;
+		std::vector<cEntity*> aliens_;
+
 		sShieldHealth shield1Hp_,
 					  shield2Hp_,
 					  shield3Hp_,
@@ -57,6 +67,14 @@ class cMainState : public cGameState
 		cEntity* bulletArray_[12];
 		double playerBulletVel_,
 			   alienBulletVel_;
+		sAlienInfo alienInfo_;
+		double shipVel_;
+		sShipInfo shipInfo_;
+
+		bool showDebug_;
+		int lSensColIndex_,
+			rSensColIndex_;
+		MTRand_int32 rng_;
 };
 
 #endif
