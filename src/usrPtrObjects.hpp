@@ -32,4 +32,13 @@ struct sShipInfo {
 	int numShips = 3;
 };
 
+const int SHIP_IDLE = 0,
+	  	  SHIP_MOVE_LEFT = 1,
+		  SHIP_MOVE_RIGHT = 2,
+		  SHIP_SHOOT = 3,
+		  ALIEN_IDLE = 0,
+		  ALIEN_MOVE_LEFT = 1,
+		  ALIEN_MOVE_RIGHT = 2,
+		  ALIEN_SHOOT = 3;
+
 #endif

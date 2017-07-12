@@ -54,7 +54,8 @@ class cMainState : public cGameState
 
 		cEntity* leftSensor_,
 			   * rightSensor_,
-			   * groundSensor_;
+			   * groundSensorBullet_,
+			   * groundSensorAlien_;
 		std::vector<cEntity*> aliens_;
 
 		sShieldHealth shield1Hp_,

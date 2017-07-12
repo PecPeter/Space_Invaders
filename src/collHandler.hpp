@@ -37,7 +37,7 @@ void collAlienBulletWithGroundSensor (cEntity& alienBullet);
 void collAlienWithShipBullet (cEntity& alien, cEntity& shipBullet);
 void collAlienWithShield (cEntity& shield,
 		const std::list<sCollPairInfo>& collList);
-void collAlienWithGroundSensor (cEntity& alien);
+void collAlienWithAlienEndSensor (cEntity& alien);
 
 // Alien sensor collision functions
 void collAlienSensorWithWall (cEntity& alienSensor,

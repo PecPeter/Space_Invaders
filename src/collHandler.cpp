@@ -25,14 +25,14 @@ void collHandler (const cCollPair& collPair) {
 		collAlienBulletWithShipBullet(ent1,ent2);
 	else if (entMask1 == ALIEN_BULLET_MASK && entMask2 == SHIELD_MASK)
 		collAlienBulletWithShield (ent1,ent2,collPair.getCollisions());
-	else if (entMask1 == ALIEN_BULLET_MASK && entMask2 == GROUND_SENSOR_MASK)
+	else if (entMask1 == ALIEN_BULLET_MASK && entMask2 == BULLET_SENSOR_MASK)
 		collAlienBulletWithGroundSensor(ent1);
 	else if (entMask1 == ALIEN_MASK && entMask2 == SHIP_BULLET_MASK)
 		collAlienWithShipBullet(ent1,ent2);
 	else if (entMask1 == ALIEN_MASK && entMask2 == SHIELD_MASK)
 		collAlienWithShield(ent2,collPair.getCollisions());
-	else if (entMask1 == ALIEN_MASK && entMask2 == GROUND_SENSOR_MASK)
-		collAlienWithGroundSensor(ent1);
+	else if (entMask1 == ALIEN_MASK && entMask2 == ALIEN_END_SENSOR_MASK)
+		collAlienWithAlienEndSensor(ent1);
 	else if (entMask1 == ALIEN_SENSOR_MASK && entMask2 == WALL_MASK)
 		collAlienSensorWithWall(ent1,collPair.getCollisions());
 }
@@ -53,21 +53,26 @@ void collShipWithAlienBullet (cEntity& ship, cEntity& alienBullet) {
 	static_cast<sShipInfo*>(ship.getUsrPtr())->numShips -= 1;
 	ship.setPos(320,330);
 	alienBullet.setNodeActivity(0,false);
+	(static_cast<cEntity*>(alienBullet.getUsrPtr()))->setState(ALIEN_IDLE);
 }
 
 // Ship bullet collision functions
 void collShipBulletWithWall (cEntity& shipBullet) {
 	shipBullet.setNodeActivity(0,false);
+	static_cast<cEntity*>(shipBullet.getUsrPtr())->setState(SHIP_IDLE);
 }
 
 void collShipBulletWithAlienBullet (cEntity& shipBullet, cEntity& alienBullet) {
 	shipBullet.setNodeActivity(0,false);
 	alienBullet.setNodeActivity(0,false);
+	static_cast<cEntity*>(shipBullet.getUsrPtr())->setState(SHIP_IDLE);
+	static_cast<cEntity*>(alienBullet.getUsrPtr())->setState(ALIEN_IDLE);
 }
 
 void collShipBulletWithShield (cEntity& shipBullet, cEntity& shield,
 		const std::list<sCollPairInfo>& collList) {
 	shipBullet.setNodeActivity(0,false);
+	static_cast<cEntity*>(shipBullet.getUsrPtr())->setState(SHIP_IDLE);
 	// Subtract health from the shield node that was hit, deactivate
 	// it if its too low
 	for (const auto& itr : collList) {
@@ -92,6 +97,7 @@ void collShipBulletWithAlien (cEntity& shipBullet, cEntity& alien) {
 	sAlienInfo* tmpPtr = static_cast<sAlienInfo*>(alien.getUsrPtr());
 	tmpPtr->totalAliens -= 1;;
 	tmpPtr->numAlienCol[alienCol] -= 1;
+	static_cast<cEntity*>(shipBullet.getUsrPtr())->setState(SHIP_IDLE);
 }
 
 // Alien bullet collision functions
@@ -125,6 +131,7 @@ void collAlienBulletWithShield (cEntity& alienBullet, cEntity& shield,
 
 void collAlienBulletWithGroundSensor (cEntity& alienBullet) {
 	alienBullet.setNodeActivity(0,false);
+	static_cast<cEntity*>(alienBullet.getUsrPtr())->setState(ALIEN_IDLE);
 }
 
 // Alien collision functions
@@ -141,7 +148,7 @@ void collAlienWithShield (cEntity& shield,
 	}
 }
 
-void collAlienWithGroundSensor (cEntity& alien) {
+void collAlienWithAlienEndSensor (cEntity& alien) {
 	static_cast<sAlienInfo*>(alien.getUsrPtr())->endState = eEndState::GAME_OVER;
 }
 

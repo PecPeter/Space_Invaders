@@ -4,8 +4,8 @@ cMainState::cMainState (void): cGameState(eStateAction::NONE,
 		eStateAction::REMOVE_STATE), world_(nullptr), ship_(nullptr),
 		walls_(nullptr), shield1_(nullptr), shield2_(nullptr),
 		shield3_(nullptr), shield4_(nullptr), leftSensor_(nullptr),
-		rightSensor_(nullptr), groundSensor_(nullptr),
-		rng_(time(NULL)) {
+		rightSensor_(nullptr), groundSensorBullet_(nullptr),
+		groundSensorAlien_(nullptr), rng_(time(NULL)) {
 	setSettings(15,5);
 	cntrlKb_.addCommand(eKbAction::M_LEFT,SDLK_a);
 	cntrlKb_.addCommand(eKbAction::M_RIGHT,SDLK_d);
@@ -168,9 +168,12 @@ cMainState::cMainState (void): cGameState(eStateAction::NONE,
 	cCollAabb gSensShape(200,50);
 	cCollComp gSensCollComp(gSensShape);
 	cEntityNode gSensNode(0,cPosComp(0.0,0.0,0.0),gSensCollComp);
-	groundSensor_ = world_->createEntity(8,cPosComp(320,400,0),gSensNode,
-			eEntityType::STATIC,GROUND_SENSOR_MASK);
-	world_->addCollMask(GROUND_SENSOR_MASK,GROUND_SENSOR_COLL_MASK);
+	groundSensorBullet_ = world_->createEntity(8,cPosComp(320,400,0),gSensNode,
+			eEntityType::STATIC,BULLET_SENSOR_MASK);
+	groundSensorAlien_ = world_->createEntity(9,cPosComp(320,350,0),gSensNode,
+			eEntityType::STATIC,ALIEN_END_SENSOR_MASK);
+	world_->addCollMask(BULLET_SENSOR_MASK,BULLET_SENSOR_COLL_MASK);
+	world_->addCollMask(ALIEN_END_SENSOR_MASK,ALIEN_END_SENSOR_COLL_MASK);
 
 	// Create the bullets
 	cCollAabb bulletShape(1.0,1.0);
@@ -182,12 +185,13 @@ cMainState::cMainState (void): cGameState(eStateAction::NONE,
 	
 	cEntityNode bulletNode(0,bulletPos,bulletCollComp);
 
-	bulletArray_[0] = world_->createEntity(9,bulletPos1,bulletNode,
+	bulletArray_[0] = world_->createEntity(10,bulletPos1,bulletNode,
 			eEntityType::DYNAMIC,SHIP_BULLET_MASK);
 	bulletArray_[0]->setNodeActivity(0,false);
-	for (int i = 1; i < 12; ++i)
-	{
-		bulletArray_[i] = world_->createEntity(9+i,bulletPos1,bulletNode,
+	bulletArray_[0]->setUsrPtr(static_cast<void*>(ship_));
+	for (int i = 1; i < 12; ++i) {
+		int bulletId = 10 + i;
+		bulletArray_[i] = world_->createEntity(bulletId,bulletPos1,bulletNode,
 				eEntityType::DYNAMIC,ALIEN_BULLET_MASK);
 		bulletArray_[i]->setNodeActivity(0,false);
 	}
@@ -236,14 +240,19 @@ int cMainState::updateState (double tickRate, void** interStateInfo) {
 		for (auto& kbCommand : kbActions_) {
 			switch (kbCommand) {
 				case eKbAction::M_LEFT:
+					ship_->setState(SHIP_MOVE_LEFT);
 					playerDir -= 1.0;;
 					break;
 				case eKbAction::M_RIGHT:
+					ship_->setState(SHIP_MOVE_RIGHT);
 					playerDir += 1.0;
 					break;
 				case eKbAction::SHOOT:
-					bulletArray_[0]->setNodeActivity(0,true);
-					bulletArray_[0]->setPos(ship_->getPos());
+					if (ship_->getState() != SHIP_SHOOT) {
+						ship_->setState(SHIP_SHOOT);
+						bulletArray_[0]->setNodeActivity(0,true);
+						bulletArray_[0]->setPos(ship_->getPos());
+					}
 					break;
 				case eKbAction::TOGGLE_DEBUG:
 					showDebug_ = !showDebug_;
@@ -317,14 +326,17 @@ int cMainState::updateState (double tickRate, void** interStateInfo) {
 				// Select alien that fired
 				while (1) {
 					int alienIndex = rng_() % 55;
-					if (aliens_.at(alienIndex)->getActivity() == true) {
+					if (aliens_.at(alienIndex)->getActivity() == true &&
+							aliens_.at(alienIndex)->getState() != ALIEN_SHOOT) {
+						aliens_.at(alienIndex)->setState(ALIEN_SHOOT);
+						bulletArray_[i]->setUsrPtr(static_cast<void*>(
+									aliens_.at(alienIndex)));
 						cVector2 alienPos = aliens_.at(alienIndex)->getPos();
 						bulletArray_[i]->setPos(alienPos);
 						bulletArray_[i]->setActivity(true);
 						break;
 					}
 				}
-
 			}
 		}
 	}
